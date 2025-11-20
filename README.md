@@ -199,7 +199,6 @@ streamlit run app.py
 
 ## 📈 Statistiques
 
-- 22+ commits sur GitHub
 - 4 agents (1 supervisor + 3 spécialisés)
 - 13 tools fonctionnels
 - 2 interfaces (CLI + Streamlit)
@@ -218,7 +217,6 @@ streamlit run app.py
 
 - [Architecture détaillée](docs/ARCHITECTURE.md)
 - [Guide d'utilisation](docs/USAGE.md)
-- [Guide de présentation](docs/PRESENTATION.md)
 
 ## 👨‍💻 Auteur
 
