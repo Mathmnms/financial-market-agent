@@ -32,5 +32,24 @@ Sois précis, factuel et professionnel dans tes analyses."""
             HumanMessage(content=query)
         ]
         
+        # Premier appel : l'agent décide quels tools utiliser
         response = self.llm_with_tools.invoke(messages)
+        
+        # Si l'agent veut appeler des tools
+        if hasattr(response, 'tool_calls') and response.tool_calls:
+            # Exécuter les tools
+            from langgraph.prebuilt import ToolNode
+            tool_node = ToolNode(finance_tools)
+            tool_results = tool_node.invoke({"messages": [response]})
+            
+            # Ajouter les résultats et demander la réponse finale
+            messages.append(response)
+            for tool_msg in tool_results["messages"]:
+                messages.append(tool_msg)
+            
+            # Deuxième appel : générer la réponse finale
+            final_response = self.llm.invoke(messages)
+            return final_response.content
+        
+        # Si pas de tool call, retourner la réponse directe
         return response.content if hasattr(response, 'content') else str(response)

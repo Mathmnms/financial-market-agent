@@ -30,5 +30,20 @@ Sois précis dans tes calculs et explique tes résultats clairement."""
             HumanMessage(content=query)
         ]
         
+        # Premier appel
         response = self.llm_with_tools.invoke(messages)
+        
+        # Si l'agent veut appeler des tools
+        if hasattr(response, 'tool_calls') and response.tool_calls:
+            from langgraph.prebuilt import ToolNode
+            tool_node = ToolNode(calculator_tools)
+            tool_results = tool_node.invoke({"messages": [response]})
+            
+            messages.append(response)
+            for tool_msg in tool_results["messages"]:
+                messages.append(tool_msg)
+            
+            final_response = self.llm.invoke(messages)
+            return final_response.content
+        
         return response.content if hasattr(response, 'content') else str(response)
