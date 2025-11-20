@@ -24,4 +24,4 @@ ENV/
 *.db
 *.sqlite
 data/
-logs/
+logs/presentation.md
