@@ -3,7 +3,7 @@
 ## Installation
 ```bash
 # Cloner le repository
-git clone https://github.com/VOTRE_USERNAME/financial-market-agent.git
+git clone https://github.com/Mathmnms/financial-market-agent.git
 cd financial-market-agent
 
 # Créer environnement virtuel
