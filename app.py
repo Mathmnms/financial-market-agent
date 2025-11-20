@@ -3,7 +3,7 @@ Interface Streamlit pour l'agent financier.
 """
 import streamlit as st
 from dotenv import load_dotenv
-from agents.supervisor import SupervisorAgent
+from agents.langgraph_system import LangGraphFinancialAgent
 import os
 
 # Charger les variables d'environnement
@@ -55,7 +55,7 @@ st.markdown("""
 def initialize_session_state():
     """Initialise l'état de la session."""
     if 'supervisor' not in st.session_state:
-        st.session_state.supervisor = SupervisorAgent()
+        st.session_state.supervisor = LangGraphFinancialAgent()
     if 'history' not in st.session_state:
         st.session_state.history = []
 
