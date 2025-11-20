@@ -1,5 +1,40 @@
 # Architecture du Système
 
+## 🔄 Utilisation de LangGraph
+
+Ce projet utilise **LangGraph** pour orchestrer les agents de manière déclarative.
+
+### Structure du Graphe
+```
+        __start__
+            ↓
+       supervisor (décide quel agent)
+            ↓
+    ┌───────┼───────┐
+    ↓       ↓       ↓
+calculator  market  researcher
+           analyst
+    └───────┼───────┘
+            ↓
+         __end__
+```
+
+### Avantages de LangGraph
+
+- **State Management** : État partagé entre tous les nœuds
+- **Routing Conditionnel** : Edges dynamiques basées sur la logique
+- **Visualisation** : Graphe visible en ASCII
+- **Extensibilité** : Facile d'ajouter de nouveaux nœuds
+- **Debuggabilité** : Suivi clair du flux d'exécution
+
+### Implémentation
+
+Le système utilise :
+- `StateGraph` pour définir le workflow
+- `AgentState` pour gérer l'état partagé
+- Edges conditionnelles pour le routing
+- Compilation du graphe pour l'exécution
+
 ## Vue d'ensemble
 
 Le Financial Market Intelligence Agent utilise une **architecture multi-agents supervisée**.
