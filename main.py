@@ -1,9 +1,9 @@
 """
-Point d'entrée principal pour l'agent financier multi-agents.
+Point d'entrée principal pour l'agent financier avec LangGraph.
 """
 import os
 from dotenv import load_dotenv
-from agents.supervisor import SupervisorAgent
+from agents.langgraph_system import LangGraphFinancialAgent
 
 # Charger les variables d'environnement
 load_dotenv()
@@ -13,7 +13,7 @@ def print_header():
     """Affiche l'en-tête de l'application."""
     print("\n" + "="*70)
     print("💼 FINANCIAL MARKET INTELLIGENCE AGENT")
-    print("🤖 Architecture Multi-Agents")
+    print("🤖 Architecture Multi-Agents avec LangGraph")
     print("="*70)
 
 
@@ -31,10 +31,13 @@ def run_interactive_mode():
     """Mode interactif pour poser des questions."""
     print_header()
     
-    # Initialiser le superviseur
-    print("\n🔄 Initialisation des agents...")
-    supervisor = SupervisorAgent()
-    print("✅ Agents prêts!\n")
+    # Initialiser le système LangGraph
+    print("\n🔄 Initialisation du système LangGraph...")
+    agent_system = LangGraphFinancialAgent()
+    print("✅ Système prêt!\n")
+    
+    # Afficher le graphe
+    agent_system.visualize()
     
     # Exemples de requêtes
     examples = [
@@ -71,7 +74,7 @@ def run_interactive_mode():
         # Traiter la requête
         print("\n🔄 Analyse en cours...")
         try:
-            response = supervisor.process(query)
+            response = agent_system.process(query)
             print_result(response)
         except Exception as e:
             print(f"\n❌ Erreur: {str(e)}")
@@ -83,10 +86,13 @@ def run_demo_mode():
     
     print("\n🎬 MODE DÉMO - Exemples d'utilisation\n")
     
-    # Initialiser le superviseur
-    print("🔄 Initialisation des agents...")
-    supervisor = SupervisorAgent()
-    print("✅ Agents prêts!\n")
+    # Initialiser le système
+    print("🔄 Initialisation du système LangGraph...")
+    agent_system = LangGraphFinancialAgent()
+    print("✅ Système prêt!\n")
+    
+    # Afficher le graphe
+    agent_system.visualize()
     
     # Exemples de démonstration
     demo_queries = [
@@ -101,7 +107,7 @@ def run_demo_mode():
         print(f"{'='*70}")
         
         try:
-            response = supervisor.process(query)
+            response = agent_system.process(query)
             print_result(response)
             
             if i < len(demo_queries):
@@ -123,6 +129,7 @@ def main():
     # Menu principal
     print("\n" + "="*70)
     print("💼 FINANCIAL MARKET INTELLIGENCE AGENT")
+    print("🔄 Utilise LangGraph pour l'orchestration multi-agents")
     print("="*70)
     print("\nChoisissez un mode:")
     print("1. Mode interactif (poser vos questions)")
