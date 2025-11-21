@@ -397,6 +397,22 @@ st.markdown("""
 </style>
 """, unsafe_allow_html=True)
 
+def save_favorites():
+    """Sauvegarde les favoris dans un fichier JSON."""
+    try:
+        with open('.streamlit_favorites.json', 'w') as f:
+            json.dump(st.session_state.favorites, f)
+    except:
+        pass
+
+
+def load_favorites():
+    """Charge les favoris depuis le fichier JSON."""
+    try:
+        with open('.streamlit_favorites.json', 'r') as f:
+            return json.load(f)
+    except:
+        return []
 
 def initialize_session_state():
     """Initialise l'état de la session avec persistence."""
@@ -411,7 +427,7 @@ def initialize_session_state():
             'Researcher': 0
         }
     if 'favorites' not in st.session_state:
-        st.session_state.favorites = []
+        st.session_state.favorites = load_favorites()  # ✅ Changement ici
     if 'theme' not in st.session_state:
         st.session_state.theme = 'dark'
     if 'watchlist' not in st.session_state:
@@ -521,8 +537,10 @@ def display_premium_sidebar():
         if st.button("🔄 Rafraîchir Watchlist", use_container_width=True):
             st.rerun()
         
-        if st.button("⭐ Gérer Favoris", use_container_width=True):
-            st.session_state.show_favorites = True
+        fav_count = len(st.session_state.favorites)
+        if st.button(f"⭐ Favoris ({fav_count})", use_container_width=True):
+            st.session_state.active_tab = 1  # Aller à l'onglet Favoris
+            st.rerun()
         
         if st.button("📥 Export Complet", use_container_width=True):
             st.session_state.show_export = True
@@ -692,10 +710,16 @@ def tab_analyze_ultimate():
         st.session_state.example_query = ""
         st.rerun()
     
-    if fav and query and query not in st.session_state.favorites:
-        st.session_state.favorites.append(query)
-        st.success("✅ Ajouté aux favoris !")
-    
+    if fav and query:
+        if query not in st.session_state.favorites:
+            st.session_state.favorites.append(query)
+            save_favorites()  # ✅ Sauvegarder
+            st.success("✅ Ajouté aux favoris !")
+            time.sleep(1)
+            st.rerun()
+        else:
+            st.warning("⚠️ Cette requête est déjà dans vos favoris !")
+        
     # Analyse
     if analyze and query:
         st.markdown("---")
@@ -913,6 +937,97 @@ def tab_stats_ultimate():
         )
         st.plotly_chart(fig, use_container_width=True)
 
+def tab_favorites_ultimate():
+    """Onglet Favoris ultra premium."""
+    
+    st.markdown("### ⭐ Mes Favoris")
+    
+    if not st.session_state.favorites:
+        st.markdown("""
+        <div class="glass-card" style="text-align: center; padding: 3rem;">
+            <div style="font-size: 4rem; margin-bottom: 1rem;">⭐</div>
+            <h3 style="color: #f1f5f9;">Aucun favori enregistré</h3>
+            <p style="color: #94a3b8;">Ajoutez vos requêtes préférées en cliquant sur ⭐ dans l'onglet Analyser</p>
+        </div>
+        """, unsafe_allow_html=True)
+        return
+    
+    st.markdown(f"**{len(st.session_state.favorites)} requête(s) favorite(s)**")
+    st.markdown("---")
+    
+    # Options de gestion
+    col1, col2 = st.columns([3, 1])
+    with col2:
+        if st.button("🗑️ Tout effacer", use_container_width=True):
+            st.session_state.favorites = []
+            save_favorites()
+            st.rerun()
+    
+    # Affichage des favoris
+    for i, fav_query in enumerate(st.session_state.favorites):
+        col1, col2, col3 = st.columns([6, 1, 1])
+        
+        with col1:
+            st.markdown(f"""
+            <div class="glass-card" style="padding: 1rem;">
+                <p style="color: #f1f5f9; margin: 0; font-size: 1.05rem;">
+                    {fav_query}
+                </p>
+            </div>
+            """, unsafe_allow_html=True)
+        
+        with col2:
+            if st.button("🚀", key=f"use_fav_{i}", use_container_width=True, help="Utiliser cette requête"):
+                st.session_state.example_query = fav_query
+                st.session_state.active_tab = 1
+                st.rerun()
+        
+        with col3:
+            if st.button("❌", key=f"del_fav_{i}", use_container_width=True, help="Supprimer"):
+                st.session_state.favorites.pop(i)
+                save_favorites()
+                st.rerun()
+        
+        st.markdown("<br>", unsafe_allow_html=True)
+    
+    # Statistiques
+    st.markdown("---")
+    st.markdown("### 📊 Statistiques")
+    
+    col1, col2, col3 = st.columns(3)
+    
+    with col1:
+        st.markdown(f"""
+        <div class="metric-ultimate">
+            <div style="font-size: 2rem;">⭐</div>
+            <div class="metric-label">Total Favoris</div>
+            <div class="metric-value">{len(st.session_state.favorites)}</div>
+        </div>
+        """, unsafe_allow_html=True)
+    
+    with col2:
+        # Calculer la longueur moyenne
+        avg_length = sum(len(f) for f in st.session_state.favorites) / len(st.session_state.favorites) if st.session_state.favorites else 0
+        st.markdown(f"""
+        <div class="metric-ultimate">
+            <div style="font-size: 2rem;">📏</div>
+            <div class="metric-label">Longueur Moyenne</div>
+            <div class="metric-value">{avg_length:.0f}</div>
+            <div style="color: #94a3b8; font-size: 0.85rem;">caractères</div>
+        </div>
+        """, unsafe_allow_html=True)
+    
+    with col3:
+        # Trouver le favori le plus long
+        longest = max(st.session_state.favorites, key=len) if st.session_state.favorites else ""
+        st.markdown(f"""
+        <div class="metric-ultimate">
+            <div style="font-size: 2rem;">🏆</div>
+            <div class="metric-label">Plus Long</div>
+            <div class="metric-value">{len(longest)}</div>
+            <div style="color: #94a3b8; font-size: 0.85rem;">caractères</div>
+        </div>
+        """, unsafe_allow_html=True)
 
 def main():
     """Fonction principale."""
@@ -921,23 +1036,27 @@ def main():
     display_premium_sidebar()
     
     # Tabs
-    tab1, tab2, tab3, tab4 = st.tabs([
+    tab1, tab2, tab3, tab4, tab5 = st.tabs([
         "🏠 Accueil",
         "🎯 Analyser", 
+        "⭐ Favoris",
         "📜 Historique",
         "📊 Stats"
     ])
-    
+
     with tab1:
         tab_home_ultimate()
-    
+
     with tab2:
         tab_analyze_ultimate()
-    
+
     with tab3:
-        tab_history_ultimate()
-    
+        tab_favorites_ultimate()
+
     with tab4:
+        tab_history_ultimate()
+
+    with tab5:
         tab_stats_ultimate()
     
     # Footer
