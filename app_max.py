@@ -628,10 +628,10 @@ def tab_home_ultimate():
     for i, (col, (icon, title, desc)) in enumerate(zip([col1, col2, col3] * 2, features)):
         with col:
             st.markdown(f"""
-            <div class="glass-card">
+            <div class="glass-card" style="min-height: 280px; display: flex; flex-direction: column;">
                 <div style="font-size: 2.5rem; margin-bottom: 1rem;">{icon}</div>
-                <h3 style="color: #f1f5f9; margin-bottom: 0.5rem;">{title}</h3>
-                <p style="color: #94a3b8; font-size: 0.95rem;">{desc}</p>
+                <h3 style="color: #f1f5f9; margin-bottom: 0.5rem; flex-shrink: 0;">{title}</h3>
+                <p style="color: #94a3b8; font-size: 0.95rem; flex-grow: 1;">{desc}</p>
             </div>
             """, unsafe_allow_html=True)
     
