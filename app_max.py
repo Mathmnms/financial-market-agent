@@ -963,13 +963,25 @@ def tab_favorites_ultimate():
             save_favorites()
             st.rerun()
     
-    # Affichage des favoris
+    # Affichage des favoris avec style amélioré
+    st.markdown("""
+    <style>
+    .fav-container {
+        display: grid;
+        grid-template-columns: 8fr 1fr 1fr;
+        gap: 0.5rem;
+        margin-bottom: 0.75rem;
+        align-items: center;
+    }
+    </style>
+    """, unsafe_allow_html=True)
+
     for i, fav_query in enumerate(st.session_state.favorites):
-        col1, col2, col3 = st.columns([6, 1, 1])
+        col1, col2, col3 = st.columns([8, 1, 1])
         
         with col1:
             st.markdown(f"""
-            <div class="glass-card" style="padding: 1rem;">
+            <div class="glass-card" style="padding: 1.2rem 1rem; margin: 0;">
                 <p style="color: #f1f5f9; margin: 0; font-size: 1.05rem;">
                     {fav_query}
                 </p>
@@ -977,18 +989,20 @@ def tab_favorites_ultimate():
             """, unsafe_allow_html=True)
         
         with col2:
-            if st.button("🚀", key=f"use_fav_{i}", use_container_width=True, help="Utiliser cette requête"):
+            st.markdown('<div style="height: 100%;">', unsafe_allow_html=True)
+            if st.button("🚀", key=f"use_fav_{i}", use_container_width=True, help="Utiliser"):
                 st.session_state.example_query = fav_query
                 st.session_state.active_tab = 1
                 st.rerun()
+            st.markdown('</div>', unsafe_allow_html=True)
         
         with col3:
+            st.markdown('<div style="height: 100%;">', unsafe_allow_html=True)
             if st.button("❌", key=f"del_fav_{i}", use_container_width=True, help="Supprimer"):
                 st.session_state.favorites.pop(i)
                 save_favorites()
                 st.rerun()
-        
-        st.markdown("<br>", unsafe_allow_html=True)
+            st.markdown('</div>', unsafe_allow_html=True)
     
     # Statistiques
     st.markdown("---")
