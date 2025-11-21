@@ -62,8 +62,8 @@ cp .env.example .env
 
 Exemple de `.env` :
 ```env
-OPENAI_API_KEY=sk-votre-clé-ici
-TAVILY_API_KEY=tvly-votre-clé-ici
+OPENAI_API_KEY="sk-votre-clé-ici"
+TAVILY_API_KEY="tvly-votre-clé-ici"
 ```
 
 ## 💻 Utilisation
