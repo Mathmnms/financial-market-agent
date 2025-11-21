@@ -397,23 +397,6 @@ st.markdown("""
 </style>
 """, unsafe_allow_html=True)
 
-def save_favorites():
-    """Sauvegarde les favoris dans un fichier JSON."""
-    try:
-        with open('.streamlit_favorites.json', 'w') as f:
-            json.dump(st.session_state.favorites, f)
-    except:
-        pass
-
-
-def load_favorites():
-    """Charge les favoris depuis le fichier JSON."""
-    try:
-        with open('.streamlit_favorites.json', 'r') as f:
-            return json.load(f)
-    except:
-        return []
-
 def initialize_session_state():
     """Initialise l'état de la session avec persistence."""
     if 'supervisor' not in st.session_state:
@@ -421,11 +404,7 @@ def initialize_session_state():
     if 'history' not in st.session_state:
         st.session_state.history = load_history()
     if 'agent_stats' not in st.session_state:
-        st.session_state.agent_stats = {
-            'Market Analyst': 0,
-            'Calculator': 0,
-            'Researcher': 0
-        }
+        st.session_state.agent_stats = load_agent_stats()  # ✅ Chargement depuis fichier ou historique
     if 'favorites' not in st.session_state:
         st.session_state.favorites = load_favorites()  # ✅ Changement ici
     if 'theme' not in st.session_state:
@@ -451,6 +430,55 @@ def load_history():
     except:
         return []
 
+def save_favorites():
+    """Sauvegarde les favoris dans un fichier JSON."""
+    try:
+        with open('.streamlit_favorites.json', 'w') as f:
+            json.dump(st.session_state.favorites, f)
+    except:
+        pass
+
+
+def load_favorites():
+    """Charge les favoris depuis le fichier JSON."""
+    try:
+        with open('.streamlit_favorites.json', 'r') as f:
+            return json.load(f)
+    except:
+        return []
+
+def save_agent_stats():
+    """Sauvegarde les stats des agents dans un fichier JSON."""
+    try:
+        with open('.streamlit_agent_stats.json', 'w') as f:
+            json.dump(st.session_state.agent_stats, f)
+    except:
+        pass
+
+
+def load_agent_stats():
+    """Charge les stats des agents depuis le fichier JSON."""
+    try:
+        with open('.streamlit_agent_stats.json', 'r') as f:
+            return json.load(f)
+    except:
+        # Si le fichier n'existe pas, calculer depuis l'historique
+        stats = {
+            'Market Analyst': 0,
+            'Calculator': 0,
+            'Researcher': 0
+        }
+        
+        # Charger l'historique
+        history = load_history()
+        
+        # Compter depuis l'historique
+        for item in history:
+            agent = item.get('agent', '')
+            if agent in stats:
+                stats[agent] += 1
+        
+        return stats
 
 def get_stock_mini_chart(symbol):
     """Récupère un mini graphique pour une action."""
@@ -782,6 +810,7 @@ def tab_analyze_ultimate():
                 agent_used = response['agent_used']
                 if agent_used in st.session_state.agent_stats:
                     st.session_state.agent_stats[agent_used] += 1
+                    save_agent_stats()
                 
                 # Historique
                 st.session_state.history.append({
