@@ -548,31 +548,54 @@ def display_premium_sidebar():
         st.markdown("---")
         
         # System Stats
+        st.markdown("---")
+        st.markdown("### 📈 Stats Système")
+
         if st.session_state.history:
-            st.markdown("### 📈 Stats Système")
             total = len(st.session_state.history)
-            st.metric("Requêtes", total, delta=f"+{total}")
             
-            # Mini bar chart
-            fig = go.Figure(data=[
-                go.Bar(
-                    x=list(st.session_state.agent_stats.keys()),
-                    y=list(st.session_state.agent_stats.values()),
-                    marker_color=['#667eea', '#f5576c', '#00f2fe'],
-                    text=list(st.session_state.agent_stats.values()),
-                    textposition='auto',
-                )
-            ])
-            fig.update_layout(
-                height=150,
-                margin=dict(l=0, r=0, t=0, b=0),
-                showlegend=False,
-                paper_bgcolor='rgba(0,0,0,0)',
-                plot_bgcolor='rgba(0,0,0,0)',
-                xaxis=dict(tickfont=dict(size=10, color='#94a3b8')),
-                yaxis=dict(visible=False)
-            )
-            st.plotly_chart(fig, use_container_width=True, config={'displayModeBar': False})
+            # Metric avec style
+            st.markdown(f"""
+            <div style="text-align: center; padding: 1rem; background: rgba(102, 126, 234, 0.1); border-radius: 10px; margin-bottom: 1rem;">
+                <div style="color: #94a3b8; font-size: 0.8rem; text-transform: uppercase;">Requêtes</div>
+                <div style="font-size: 2.5rem; font-weight: 800; color: #667eea;">{total}</div>
+                <div style="color: #22c55e; font-size: 0.9rem;">↑ +{total}</div>
+            </div>
+            """, unsafe_allow_html=True)
+            
+            # Distribution des agents
+            st.markdown("**Par Agent:**")
+            
+            for agent, count in st.session_state.agent_stats.items():
+                percentage = (count / total * 100) if total > 0 else 0
+                
+                # Couleur selon l'agent
+                colors = {
+                    'Market Analyst': '#667eea',
+                    'Calculator': '#f5576c',
+                    'Researcher': '#00f2fe'
+                }
+                color = colors.get(agent, '#667eea')
+                
+                st.markdown(f"""
+                <div style="margin-bottom: 0.75rem;">
+                    <div style="display: flex; justify-content: space-between; margin-bottom: 0.25rem;">
+                        <span style="color: #f1f5f9; font-size: 0.85rem;">{agent[:10]}...</span>
+                        <span style="color: {color}; font-weight: 600;">{count}</span>
+                    </div>
+                    <div style="background: rgba(255,255,255,0.1); border-radius: 10px; height: 6px; overflow: hidden;">
+                        <div style="background: {color}; width: {percentage}%; height: 100%; border-radius: 10px; transition: width 0.3s;"></div>
+                    </div>
+                </div>
+                """, unsafe_allow_html=True)
+        else:
+            st.markdown("""
+            <div style="text-align: center; padding: 2rem; background: rgba(255,255,255,0.05); border-radius: 10px;">
+                <div style="font-size: 2rem; margin-bottom: 0.5rem;">📊</div>
+                <div style="color: #94a3b8; font-size: 0.9rem;">Aucune donnée</div>
+                <div style="color: #64748b; font-size: 0.8rem; margin-top: 0.5rem;">Effectuez une analyse</div>
+            </div>
+            """, unsafe_allow_html=True)
 
 
 def get_ultimate_badge(agent_name):
